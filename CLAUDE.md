@@ -5,5 +5,5 @@
 - Security first!
 - Minimal comments, only if needed
 - Read `docs/` before implementing — has architecture, roadmap, schemas, design system
-- When adding/removing deps, update `docs/dependencies.md`
+- When adding/removing deps, update `docs/deps.md`
 - Style - matching tokens in `global.css` and `src/consts/`, RN font use per-weight family names, not `fontWeight`

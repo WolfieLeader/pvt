@@ -98,6 +98,7 @@ Each phase defines its schema + runs migrations when it first needs the tables.
 5. Platform-specific haptic feedback tuning
 
 ### Deferred (not in V1)
+
 - Export (CSV/PDF)
 
 ---
