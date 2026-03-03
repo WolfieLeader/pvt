@@ -27,8 +27,7 @@ export default function ChatScreen() {
           onPressOut={onPressOut}
           hitSlop={10}
           className="flex-row items-center gap-xs h-[44px]"
-          style={animatedStyle}
-        >
+          style={animatedStyle}>
           <X size={20} color={textColor} />
           <Text className="text-text font-sans-medium text-body">Close</Text>
         </AnimatedPressable>

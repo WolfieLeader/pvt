@@ -18,11 +18,11 @@ export function Screen({ children, scroll, className, edges = DEFAULT_EDGES }: P
   return (
     <SafeAreaView edges={edges} className={cn("flex-1 bg-background", className)}>
       {scroll ? (
-        <ScrollView contentContainerStyle={SCROLL_CONTENT}>
-          {children}
-        </ScrollView>
+        <ScrollView contentContainerStyle={SCROLL_CONTENT}>{children}</ScrollView>
       ) : (
-        <View className="flex-1" style={PADDING_STYLE}>{children}</View>
+        <View className="flex-1" style={PADDING_STYLE}>
+          {children}
+        </View>
       )}
     </SafeAreaView>
   );

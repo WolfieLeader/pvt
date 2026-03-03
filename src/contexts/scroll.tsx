@@ -14,11 +14,7 @@ export function ScrollProvider({ children }: PropsWithChildren) {
   const prevScrollY = useSharedValue(0);
   const isScrollingDown = useSharedValue(false);
 
-  return (
-    <ScrollContext.Provider value={{ scrollY, prevScrollY, isScrollingDown }}>
-      {children}
-    </ScrollContext.Provider>
-  );
+  return <ScrollContext.Provider value={{ scrollY, prevScrollY, isScrollingDown }}>{children}</ScrollContext.Provider>;
 }
 
 export function useScrollContext() {

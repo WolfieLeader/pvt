@@ -53,9 +53,7 @@ export function IconButton({
       onPressOut={onPressOut}
       onPress={handlePress}
       disabled={disabled}
-      android_ripple={
-        Platform.OS === "android" && !disabled ? ANDROID_RIPPLE : undefined
-      }
+      android_ripple={Platform.OS === "android" && !disabled ? ANDROID_RIPPLE : undefined}
       className={cn(
         "items-center justify-center rounded-full",
         variantStyles[variant],
@@ -64,8 +62,7 @@ export function IconButton({
         className,
       )}
       style={animatedStyle}
-      {...props}
-    >
+      {...props}>
       {icon}
     </AnimatedPressable>
   );

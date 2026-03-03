@@ -38,36 +38,28 @@ export default function TabLayout() {
           name="index"
           options={{
             title: "Home",
-            tabBarIcon: ({ color, size }) => (
-              <House size={size} color={color} />
-            ),
+            tabBarIcon: ({ color, size }) => <House size={size} color={color} />,
           }}
         />
         <Tabs.Screen
           name="expenses"
           options={{
             title: "Expenses",
-            tabBarIcon: ({ color, size }) => (
-              <Receipt size={size} color={color} />
-            ),
+            tabBarIcon: ({ color, size }) => <Receipt size={size} color={color} />,
           }}
         />
         <Tabs.Screen
           name="tasks"
           options={{
             title: "Tasks",
-            tabBarIcon: ({ color, size }) => (
-              <ListChecks size={size} color={color} />
-            ),
+            tabBarIcon: ({ color, size }) => <ListChecks size={size} color={color} />,
           }}
         />
         <Tabs.Screen
           name="settings"
           options={{
             title: "Settings",
-            tabBarIcon: ({ color, size }) => (
-              <Settings size={size} color={color} />
-            ),
+            tabBarIcon: ({ color, size }) => <Settings size={size} color={color} />,
           }}
         />
       </Tabs>

@@ -75,9 +75,7 @@ export function Button({
       onPressOut={onPressOut}
       onPress={handlePress}
       disabled={isDisabled}
-      android_ripple={
-        Platform.OS === "android" && !isDisabled ? ANDROID_RIPPLE : undefined
-      }
+      android_ripple={Platform.OS === "android" && !isDisabled ? ANDROID_RIPPLE : undefined}
       className={cn(
         "items-center justify-center flex-row",
         variantStyles[variant],
@@ -86,18 +84,11 @@ export function Button({
         className,
       )}
       style={animatedStyle}
-      {...props}
-    >
+      {...props}>
       {loading ? (
-        <ActivityIndicator
-          size="small"
-          color={variant === "secondary" || variant === "ghost" ? undefined : "#fff"}
-        />
+        <ActivityIndicator size="small" color={variant === "secondary" || variant === "ghost" ? undefined : "#fff"} />
       ) : (
-        <RNText
-          className={cn(variantText[variant], sizeText[size])}
-          style={{ includeFontPadding: false }}
-        >
+        <RNText className={cn(variantText[variant], sizeText[size])} style={{ includeFontPadding: false }}>
           {children}
         </RNText>
       )}

@@ -1,10 +1,5 @@
 import { Platform } from "react-native";
-import {
-  interpolate,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-} from "react-native-reanimated";
+import { interpolate, useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 
 export const PRESS_SPRING = { mass: 1, damping: 100, stiffness: 275 } as const;
 
@@ -14,11 +9,7 @@ type Options = {
   disabled?: boolean;
 };
 
-export function usePressAnimation({
-  scale = 0.975,
-  opacity = 0.9,
-  disabled,
-}: Options = {}) {
+export function usePressAnimation({ scale = 0.975, opacity = 0.9, disabled }: Options = {}) {
   const pressed = useSharedValue(0);
 
   const animatedStyle = useAnimatedStyle(() => {

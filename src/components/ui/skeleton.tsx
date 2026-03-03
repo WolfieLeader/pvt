@@ -21,13 +21,9 @@ export function Skeleton({ width, height, radius, circle, className }: Props) {
   const opacity = useSharedValue(0.3);
 
   useEffect(() => {
-    opacity.value = withRepeat(
-      withTiming(0.7, { duration: 1200, easing: Easing.inOut(Easing.ease) }),
-      -1,
-      true,
-    );
+    opacity.value = withRepeat(withTiming(0.7, { duration: 1200, easing: Easing.inOut(Easing.ease) }), -1, true);
     return () => cancelAnimation(opacity);
-  }, []);
+  }, [opacity]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,

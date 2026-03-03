@@ -27,22 +27,10 @@ type Props = TextProps & {
   disabled?: boolean;
 };
 
-export function Text({
-  variant = "body",
-  color = "default",
-  disabled,
-  className,
-  style,
-  ...props
-}: Props) {
+export function Text({ variant = "body", color = "default", disabled, className, style, ...props }: Props) {
   return (
     <RNText
-      className={cn(
-        variants[variant],
-        colors[color],
-        disabled && "opacity-50",
-        className,
-      )}
+      className={cn(variants[variant], colors[color], disabled && "opacity-50", className)}
       style={[BASE_STYLE, style]}
       {...props}
     />

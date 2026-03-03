@@ -27,27 +27,11 @@ type Props = {
   className?: string;
 };
 
-export function Chip({
-  label,
-  icon,
-  variant = "default",
-  selected,
-  onPress,
-  className,
-}: Props) {
+export function Chip({ label, icon, variant = "default", selected, onPress, className }: Props) {
   const content = (
     <>
-      {icon != null && (
-        typeof icon === "string" ? (
-          <Text variant="caption">{icon}</Text>
-        ) : (
-          icon
-        )
-      )}
-      <Text
-        variant="caption"
-        className={cn("font-sans-medium", variantText[variant])}
-      >
+      {icon != null && (typeof icon === "string" ? <Text variant="caption">{icon}</Text> : icon)}
+      <Text variant="caption" className={cn("font-sans-medium", variantText[variant])}>
         {label}
       </Text>
     </>
@@ -67,8 +51,7 @@ export function Chip({
           hapticFeedback("tap");
           onPress();
         }}
-        className={baseClass}
-      >
+        className={baseClass}>
         {content}
       </Pressable>
     );
