@@ -85,6 +85,19 @@ Theme follows system preference by default, manual toggle in settings. Component
 - Lists: FlatList with card items, swipe actions where appropriate
 - Bottom sheets (`@gorhom/bottom-sheet`) for quick actions (edit expense, mark done, category picker, filters)
 
+### Styling Rules
+
+- **Tokens live in two layers**: CSS tokens in `global.css` (`@theme`), JS constants in `src/consts/` (spacing, typography, haptics). Check both before using arbitrary values.
+- **Never use `fontWeight`** — RN can't resolve weights from a single family name. Use per-weight font families: `font-sans` (400), `font-sans-medium` (500), `font-sans-semibold` (600), `font-sans-bold` (700). Defined in `global.css`, loaded via `use-load-fonts.ts`.
+- **Check `global.css` `@theme` before using arbitrary Tailwind `[value]` syntax** — a token likely already exists (learned via retro 260303)
+
+### UI Interaction Rules
+
+- Modals dismiss w/ "Close"/X (not "Back"), leading position; "Back" = stack pop only
+- Touch targets: minimum 44pt (iOS HIG)
+- Reuse `src/components/ui/` — check before building custom
+- All interactive elements need press animation (`usePressAnimation`) + haptics (`hapticFeedback`)
+
 ### Category Visuals
 
 - **Icons**: Emoji strings stored in `categories` DB table (e.g. "🍕"). Universal, zero bundle cost, no lucide dependency
@@ -93,3 +106,26 @@ Theme follows system preference by default, manual toggle in settings. Component
 - One distinct hue per parent category (12 total): orange, blue, cyan, violet, pink, red, green, amber, sky, emerald, rose, gray
 
 See [screens/](screens/) for per-screen layouts, navigation, and behavior.
+
+### Platform Design Guidelines
+
+The app takes inspiration from and follows **Apple Human Interface Guidelines** (iOS) and **Samsung OneUI** (Android/Galaxy). These are the primary design authorities for platform-native behavior, interaction patterns, and component conventions.
+
+Target users are mainly **Galaxy (OneUI)** and **Apple** users.
+
+**iOS — Apple HIG:**
+- [Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/)
+- [Patterns](https://developer.apple.com/design/human-interface-guidelines/patterns)
+- [Foundations](https://developer.apple.com/design/human-interface-guidelines/foundations)
+- [Components](https://developer.apple.com/design/human-interface-guidelines/components)
+- [Inputs](https://developer.apple.com/design/human-interface-guidelines/inputs)
+- [Technologies](https://developer.apple.com/design/human-interface-guidelines/technologies)
+- [Adopting Liquid Glass](https://developer.apple.com/documentation/TechnologyOverviews/adopting-liquid-glass)
+- [Apple Design Resources](https://developer.apple.com/design/)
+
+**Android — Material Design 3 + Samsung OneUI:**
+- [Material Design 3](https://m3.material.io/)
+- [Android Design](https://developer.android.com/design/)
+- [Samsung OneUI Developer](https://developer.samsung.com/one-ui/)
+- [OneUI Design Guide (PDF)](https://design.samsung.com/global/contents/one-ui/download/oneui_design_guide_eng.pdf/)
+- [Samsung Design System](https://developer.samsung.com/design-system/)

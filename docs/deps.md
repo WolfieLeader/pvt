@@ -9,6 +9,7 @@ npm: `npmjs.com/package/{name}`
 - **react-native-web** — Run RN components on web — [docs](https://necolas.github.io/react-native-web) · [gh](https://github.com/nicolo-ribaudo/react-native-web)
 - **react-native-gesture-handler** — Native touch and gesture system — [docs](https://docs.swmansion.com/react-native-gesture-handler) · [gh](https://github.com/software-mansion/react-native-gesture-handler)
 - **react-native-reanimated** — Native thread animations — [docs](https://docs.swmansion.com/react-native-reanimated) · [gh](https://github.com/software-mansion/react-native-reanimated)
+- **@gorhom/bottom-sheet** — Bottom sheet component — [docs](https://gorhom.dev/react-native-bottom-sheet) · [gh](https://github.com/gorhom/react-native-bottom-sheet)
 - **react-native-worklets** — JS worklets for native threads — [gh](https://github.com/nicolo-ribaudo/react-native-worklets)
 - **react-native-screens** — Native navigation primitives — [gh](https://github.com/software-mansion/react-native-screens)
 - **react-native-safe-area-context** — Safe area insets provider — [gh](https://github.com/th3rdwave/react-native-safe-area-context)
@@ -26,12 +27,11 @@ npm: `npmjs.com/package/{name}`
 - **react-native-svg** — SVG support for RN — [gh](https://github.com/software-mansion/react-native-svg)
 - **react-native-mmkv** — Fast sync key-value storage — [gh](https://github.com/mrousavy/react-native-mmkv)
 - **expo-haptics** — Haptic feedback — [docs](https://docs.expo.dev/versions/latest/sdk/haptics) · [gh](https://github.com/expo/expo)
-- **@gorhom/bottom-sheet** — Bottom sheet component — [docs](https://gorhom.dev/react-native-bottom-sheet) · [gh](https://github.com/gorhom/react-native-bottom-sheet)
 - **@expo-google-fonts/inter** — Inter font (400/500/600/700) — [gh](https://github.com/expo/google-fonts)
 
 ### Expo — [docs](https://docs.expo.dev)
 
-expo, expo-constants, expo-device, expo-font, expo-glass-effect, expo-haptics, expo-image, expo-linking, expo-router, expo-splash-screen, expo-sqlite, expo-status-bar, expo-symbols, expo-system-ui, expo-web-browser
+expo, expo-constants, expo-dev-client, expo-device, expo-font, expo-glass-effect, expo-haptics, expo-image, expo-linking, expo-router, expo-splash-screen, expo-sqlite, expo-status-bar, expo-symbols, expo-system-ui, expo-web-browser
 
 ## Dev
 
@@ -61,4 +61,4 @@ bun add llama.rn expo-notifications expo-file-system expo-document-picker expo-i
 | **lucide-react-native**     | Consistent icon set across app. Requires `react-native-svg` peer                    |
 | **react-native-mmkv**       | Sync key-value: theme pref, onboarding complete flag, last active model ID          |
 | **react-native-reanimated** | Already installed. Shared element transitions, spring animations, layout animations |
-| **@gorhom/bottom-sheet**    | Bottom sheets for filters, category picker, quick edit, confirmations               |
+| **@gorhom/bottom-sheet**    | Bottom sheets: filters, category picker, quick edit, confirmations                  |

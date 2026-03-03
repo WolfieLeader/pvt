@@ -26,7 +26,15 @@ export default function RootLayout() {
       <ThemeProvider>
         <QueryProvider>
           <BottomSheetModalProvider>
-            <Stack />
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="(tabs)" />
+              <Stack.Screen
+                name="chat"
+                options={{
+                  presentation: "modal",
+                }}
+              />
+            </Stack>
           </BottomSheetModalProvider>
         </QueryProvider>
       </ThemeProvider>
@@ -34,7 +42,7 @@ export default function RootLayout() {
   );
 }
 
-const useAppReady = () => {
+function useAppReady() {
   const fonts = useFonts();
   const migrations = useMigrations();
 
@@ -42,4 +50,4 @@ const useAppReady = () => {
     ready: fonts.success && migrations.success,
     error: fonts.error ?? migrations.error,
   } as const;
-};
+}

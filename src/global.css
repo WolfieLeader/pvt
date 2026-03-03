@@ -40,6 +40,18 @@
   --font-sans-bold: "Inter_700Bold";
 }
 
+@variant light {
+  --color-background: #fcfcfc;
+  --color-card: #ffffff;
+  --color-text: #1a1a1a;
+  --color-muted: #71717a;
+  --color-accent: #f2416c;
+  --color-success: #22c55e;
+  --color-danger: #dc2626;
+  --color-border: #e4e4e7;
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+}
+
 @variant dark {
   --color-background: #0a0a0a;
   --color-card: #161616;
