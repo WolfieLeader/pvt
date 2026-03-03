@@ -1,10 +1,10 @@
 # pvt-assistant — Bun Expo React Native app
 
+- CLAUDE.md = context cost — keep tight; details belong in docs/
 - In all interaction, be extremely concise, sacrifice grammar for concision
-- At the end of each plan, give me a list of unresolved questions to answer, if any
+- Plans: include "Key Decisions" section w/ rationale for fresh-context execution; end w/ unresolved questions list, if any
 - Security first!
-- Minimal comments, only if needed
-- Read `docs/` before implementing — has architecture, roadmap, schemas, design system
-- When adding/removing deps, update `docs/deps.md`
-- Style - matching tokens in `global.css` and `src/consts/`, RN font use per-weight family names, not `fontWeight`
-- Plans: include "Key Decisions" section w/ rationale for fresh-context execution
+- Read `docs/` before implementing — see `docs/README.md` for index
+- Deps changes → update `docs/deps.md`
+- UI: Apple HIG + Samsung OneUI — see `docs/design-system.md`
+- Minimal comments
