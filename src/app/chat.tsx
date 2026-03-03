@@ -3,8 +3,7 @@ import { X } from "lucide-react-native";
 import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useCSSVariable } from "uniwind";
-
-import { AnimatedPressable } from "~/components/ui/animated-pressable";
+import { AnimatedPressable } from "~/components";
 import { hapticFeedback } from "~/consts/haptics";
 import { usePressAnimation } from "~/hooks/use-press-animation";
 
@@ -20,13 +19,13 @@ export default function ChatScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <View className="flex-row items-center justify-between px-[20px] py-sm">
+      <View className="flex-row items-center justify-between px-5 py-sm">
         <AnimatedPressable
           onPress={dismiss}
           onPressIn={onPressIn}
           onPressOut={onPressOut}
           hitSlop={10}
-          className="flex-row items-center gap-xs h-[44px]"
+          className="flex-row items-center gap-xs h-11"
           style={animatedStyle}>
           <X size={20} color={textColor} />
           <Text className="text-text font-sans-medium text-body">Close</Text>

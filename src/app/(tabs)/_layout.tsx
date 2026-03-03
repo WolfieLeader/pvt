@@ -1,7 +1,7 @@
 import { Tabs } from "expo-router";
 import { House, ListChecks, Receipt, Settings } from "lucide-react-native";
 import { useCSSVariable } from "uniwind";
-import { FAB } from "~/components/fab";
+import { FAB } from "~/components";
 import { hapticFeedback } from "~/consts/haptics";
 import { FONTS, FONT_SIZE } from "~/consts/typography";
 import { ScrollProvider } from "~/contexts/scroll";

@@ -3,6 +3,7 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { AppLockGuard } from "~/features/security";
 import "~/global.css";
 import { useFonts } from "~/hooks/use-load-fonts";
 import { useMigrations } from "~/hooks/use-migrations";
@@ -26,15 +27,12 @@ export default function RootLayout() {
       <ThemeProvider>
         <QueryProvider>
           <BottomSheetModalProvider>
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="(tabs)" />
-              <Stack.Screen
-                name="chat"
-                options={{
-                  presentation: "modal",
-                }}
-              />
-            </Stack>
+            <AppLockGuard>
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="chat" options={{ presentation: "modal" }} />
+              </Stack>
+            </AppLockGuard>
           </BottomSheetModalProvider>
         </QueryProvider>
       </ThemeProvider>
