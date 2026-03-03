@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { ScrollView, TextInput, View } from "react-native";
-import { RECOVERY_QUESTIONS } from "../consts";
-import { hapticFeedback } from "~/consts/haptics";
-import { storeRecoveryAnswers } from "../crypto";
 import { Button, Card, Text } from "~/components";
+import { hapticFeedback } from "~/consts/haptics";
 import { cn } from "~/utils/cn";
+import { RECOVERY_QUESTIONS } from "../consts";
+import { storeRecoveryAnswers } from "../crypto";
 
 type Props = {
   onComplete: () => void;
