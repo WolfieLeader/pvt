@@ -1,4 +1,4 @@
-# Design System — pvt-assistant
+# Design System — Pvt.
 
 ## UI/UX Design System
 
@@ -114,6 +114,7 @@ The app takes inspiration from and follows **Apple Human Interface Guidelines** 
 Target users are mainly **Galaxy (OneUI)** and **Apple** users.
 
 **iOS — Apple HIG:**
+
 - [Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/)
 - [Patterns](https://developer.apple.com/design/human-interface-guidelines/patterns)
 - [Foundations](https://developer.apple.com/design/human-interface-guidelines/foundations)
@@ -124,6 +125,7 @@ Target users are mainly **Galaxy (OneUI)** and **Apple** users.
 - [Apple Design Resources](https://developer.apple.com/design/)
 
 **Android — Material Design 3 + Samsung OneUI:**
+
 - [Material Design 3](https://m3.material.io/)
 - [Android Design](https://developer.android.com/design/)
 - [Samsung OneUI Developer](https://developer.samsung.com/one-ui/)

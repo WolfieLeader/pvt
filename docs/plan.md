@@ -1,4 +1,4 @@
-# Implementation Roadmap — pvt-assistant
+# Implementation Roadmap — Pvt.
 
 ## Implementation Phases
 
@@ -254,25 +254,25 @@ Error boundaries, empty states, subscriptions, search, export.
 
 ## Key Decisions
 
-| Decision                                            | Rationale                                                                                            |
-| --------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| **Security before chat (Phase 6)**                  | Finance app — trust requires lock screen before any data entry                                       |
-| **Prompt engineering before chat (Phase 10)**       | Validate prompts work before wiring into UI, faster iteration with Bun eval harness                  |
+| Decision                                            | Rationale                                                                                                                                                             |
+| --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Security before chat (Phase 6)**                  | Finance app — trust requires lock screen before any data entry                                                                                                        |
+| **Prompt engineering before chat (Phase 10)**       | Validate prompts work before wiring into UI, faster iteration with Bun eval harness                                                                                   |
 | **Standalone eval harness**                         | Own `package.json` in `eval/`, no cross-imports from `src/`. Extraction schemas (~25 lines) duplicated with just `zod` — avoids `~/utils/zod` → `nanoid` import chain |
-| **Prompts developed in eval first**                 | Faster iteration: edit → run eval → check accuracy. Copy finalized prompts to `src/llm/` in Phase 11 |
-| **Per-model overrides for content, not formatting** | llama.cpp handles format via chat templates; overrides adjust instruction style per model family     |
-| **Stateless chat sessions**                         | No memory between sessions, follow-up within session for partial data                                |
-| **Ephemeral chat (useState, no DB)**                | Messages don't persist — only extracted entities written to DB                                       |
-| **Non-blocking model download**                     | Download starts in onboarding, runs in background, only gates chat/AI. Manual forms work immediately |
-| **3 model swap strategies**                         | Keep both / replace after download / replace immediately — covers all user preferences               |
-| **AI-first, manual forms as fallback**              | Chat is primary input; forms exist in chat modal for when user knows exact data                      |
-| **Echo mode before extraction**                     | De-risk LLM integration — verify chat UI + pipeline works before extraction logic                    |
-| **GBNF grammars**                                   | Constrain structured LLM output on small models — prevents malformed JSON                            |
-| **expo-crypto + expo-secure-store for PIN**         | expo-crypto for reliable cross-platform SHA-256, expo-secure-store for keychain/keystore storage     |
-| **Attempt throttling**                              | 5 attempts → 30s lockout, doubling escalation                                                        |
-| **Recovery questions**                              | 2 of 4 preset questions, hashed answers in secure store, allows PIN reset                            |
-| **English only for V1**                             | Scope control; multi-language deferred to V2                                                         |
-| **Budget goals deferred to V2**                     | Overall daily/weekly/monthly spend limits are V2 scope                                               |
+| **Prompts developed in eval first**                 | Faster iteration: edit → run eval → check accuracy. Copy finalized prompts to `src/llm/` in Phase 11                                                                  |
+| **Per-model overrides for content, not formatting** | llama.cpp handles format via chat templates; overrides adjust instruction style per model family                                                                      |
+| **Stateless chat sessions**                         | No memory between sessions, follow-up within session for partial data                                                                                                 |
+| **Ephemeral chat (useState, no DB)**                | Messages don't persist — only extracted entities written to DB                                                                                                        |
+| **Non-blocking model download**                     | Download starts in onboarding, runs in background, only gates chat/AI. Manual forms work immediately                                                                  |
+| **3 model swap strategies**                         | Keep both / replace after download / replace immediately — covers all user preferences                                                                                |
+| **AI-first, manual forms as fallback**              | Chat is primary input; forms exist in chat modal for when user knows exact data                                                                                       |
+| **Echo mode before extraction**                     | De-risk LLM integration — verify chat UI + pipeline works before extraction logic                                                                                     |
+| **GBNF grammars**                                   | Constrain structured LLM output on small models — prevents malformed JSON                                                                                             |
+| **expo-crypto + expo-secure-store for PIN**         | expo-crypto for reliable cross-platform SHA-256, expo-secure-store for keychain/keystore storage                                                                      |
+| **Attempt throttling**                              | 5 attempts → 30s lockout, doubling escalation                                                                                                                         |
+| **Recovery questions**                              | 2 of 4 preset questions, hashed answers in secure store, allows PIN reset                                                                                             |
+| **English only for V1**                             | Scope control; multi-language deferred to V2                                                                                                                          |
+| **Budget goals deferred to V2**                     | Overall daily/weekly/monthly spend limits are V2 scope                                                                                                                |
 
 ## V2 Features (post-MVP)
 

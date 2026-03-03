@@ -1,4 +1,4 @@
-# Model Catalog — pvt-assistant
+# Model Catalog — Pvt.
 
 > Last updated: 2026-03-02
 

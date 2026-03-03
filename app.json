@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Pvt. Assistant",
-    "slug": "pvt-assistant",
+    "name": "Pvt.",
+    "slug": "pvt",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "pvtassistant",
+    "scheme": "pvt",
     "userInterfaceStyle": "automatic",
     "android": {
       "adaptiveIcon": {
@@ -14,7 +14,7 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.pvtassistant"
+      "package": "com.anonymous.pvt"
     },
     "web": {
       "output": "static",
@@ -37,7 +37,7 @@
       "reactCompiler": true
     },
     "ios": {
-      "bundleIdentifier": "com.anonymous.pvtassistant"
+      "bundleIdentifier": "com.anonymous.pvt"
     }
   }
 }
