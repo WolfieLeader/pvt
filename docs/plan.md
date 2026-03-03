@@ -37,7 +37,7 @@ All Drizzle schemas, Zod validation types, and migrations defined upfront so for
 7. Wire real migrations hook — `src/hooks/use-migrations.ts`
 8. Create amount utilities — `src/utils/amount.ts`
 
-### Phase 4: Navigation Shell
+### Phase 4: Navigation Shell — Complete
 
 Tab navigation + FAB + chat modal route only. No UI components or forms yet.
 
@@ -46,272 +46,227 @@ Tab navigation + FAB + chat modal route only. No UI components or forms yet.
 3. Add ScrollContext (reanimated shared value) for FAB scroll-hide behavior
 4. Create placeholder tab screens
 
-### Phase 5: Shared UI Components
+### Phase 5: Shared UI Components — Complete
 
 Reusable primitives for all feature screens.
 
 1. Build shared UI components: Button, Card, Text, Chip, IconButton, Skeleton, Screen, FAB
 
-### Phase 6: Security — App Lock & Privacy
+### Phase 6: Security — App Lock & Privacy — Complete
 
-Pre-chat for finance trust. Users handle money data — lock screen must exist before any data entry.
+Opt-in privacy controls with comfort-first defaults.
 
 1. Install `expo-secure-store`
 2. Security Zustand store (lock enabled flag, privacy mode flag, lock state, failed attempt count)
 3. Passcode set/change UI — hash PIN with SHA-256 via `expo-crypto` (`digestStringAsync`), store hash + salt in `expo-secure-store`
-4. Attempt throttling — lock out after 5 failed attempts, 30s cooldown, escalating (doubles each lockout)
-5. Recovery questions setup — user picks 2 of 4 preset questions (mother's birthplace, first pet's name, childhood street, favorite teacher), answers hashed + stored in `expo-secure-store`. Also configurable later in Settings.
+4. Attempt throttling — 5 failed attempts then lockout (10s), then 3-attempt rounds with lockouts 30s → 60s → 120s (cap)
+5. Recovery questions setup — user picks 2 of 8 preset questions, answers hashed + stored in `expo-secure-store`. Also configurable later in Settings.
 6. PIN recovery flow — answer both questions correctly → allow new PIN setup
-7. Lock screen + AppState listener (lock on background → foreground)
+7. Lock screen + AppState listener (lock on background → foreground only after grace window)
 8. Privacy mode: `usePrivacy` hook + wire into expense cards/totals
 9. Update `docs/deps.md` — add `expo-secure-store`, `expo-crypto`
 
-### Phase 7: Onboarding
+**Deferred to later phases:**
 
-Model download runs in background — only gates chat/AI, not app entry.
+- Privacy mode wiring into expense cards/totals → Phase 7
+- Settings security UI (lock toggle, PIN change, recovery, privacy toggle) → Phase 14
 
-**Flow:**
+### Phase 7: Core Data Vertical Slice + Forms
 
-1. Welcome screen — app name, tagline, "Get Started" CTA
-2. Model selection — tier cards from `docs/models.md`, user picks a model, download starts immediately in background
-3. Currency picker — list of common currencies, search, writes to `settingsStore.currency`
-4. Hourly rate (optional, skip-able) — numeric input, writes to `settingsStore.hourlyRate`
-5. App lock setup (optional, skip-able) — offer passcode + recovery questions (leverages Phase 6 security store)
-6. Done — sets `onboardingStore.completed = true`, navigates to Home
+1. Install `@tanstack/react-form` (Zod via Standard Schema — no adapter)
+2. Expense/task services: full CRUD
+3. React Query hooks + cache invalidation
+4. Add-expense form, add-task form (TanStack Form + Zod validators)
+5. Manual edit/delete flows (card → edit bottom sheet, swipe/long-press → delete)
+6. Delete safety contract (same as chat): confirmation + 5s in-memory undo hold (commit on background/kill) + idempotent mutation
+7. Home, Expenses, Tasks real screens (FlashList)
+8. Privacy masking wired to all money/hour surfaces
+9. Search + filter baseline
+10. Keyboard avoidance
 
-**Download behavior:**
+- **Instrumentation**: CRUD event logging (create/update/delete counts, undo usage)
+- **Exit**: manual add/edit/delete works; delete contract verified; `just verify` passes
+- **Rollback**: if TanStack Form blocks progress, fall back to controlled inputs + Zod safeParse
 
-- Sticky banner at top of Home screen with progress bar + percentage until download completes
-- Manual add forms (Phase 9) work immediately — no model needed
-- Chat modal shows "Model downloading..." state with progress %, input disabled until ready
-- If download fails/interrupted: resume on next app open, user can retry from Settings
+### Phase 8: LLM Runtime Feasibility Spike
 
-**Dep note:** Requires `expo-file-system` for model download. Install in this phase (moved from Phase 11).
+1. Install `llama.rn`, `expo-file-system`
+2. Model lifecycle store (`model-store.ts`): `none → downloading → paused → ready → failed → canceled → swapping → ready`
+3. Download/install/resume/pause/cancel/remove prototype via `createDownloadResumable`
+4. Persist `resumeData` to MMKV for process-death recovery
+5. Device matrix on real mid-range Android + iOS
+6. **Mandatory instrumentation**: model load time, inference latency (p50/p95), peak RSS, thermal state — logged per run before any gate evaluation
 
-### Phase 8: Data Services & List Screens
+**Hard gates (tiered):**
 
-CRUD services + React Query hooks + feature screens. Tests services before LLM wiring.
+| Metric                  | Light (~1B)                    | Standard (~2-3B)               | Full (~4B)                     |
+| ----------------------- | ------------------------------ | ------------------------------ | ------------------------------ |
+| Model load              | ≤5s                            | ≤8s                            | ≤12s                           |
+| Classify p95            | ≤2s                            | ≤3s                            | ≤5s                            |
+| Extract p95             | ≤5s                            | ≤8s                            | ≤12s                           |
+| Peak RSS above baseline | ≤800MB                         | ≤1.2GB                         | ≤1.8GB                         |
+| Thermal                 | No throttle after 5 inferences | No throttle after 5 inferences | No throttle after 3 inferences |
 
-1. Implement expense-service (create, read, update, delete)
-2. Implement task-service (create, read, update, delete)
-3. Create React Query hooks wrapping services (queries + mutations + cache invalidation)
-4. Build Home screen (today's summary, recent expenses, upcoming tasks)
-5. Build expense list screen + expense-card (with work-hours context)
-6. Build task list screen + task-card
-7. Add search bar + filters on expense list (category, date range)
-8. Add search + filters on task list (priority, status)
+- **Exit**: at least one selected model passes all gates for its tier and runs chat reliably. Lifecycle deterministic and recoverable.
+- **Rollback**: if no model passes any tier, evaluate smaller quant levels (Q3) or defer LLM to cloud-hybrid in V2
+- **Spec**: `docs/llm-spike.md`
 
-### Phase 9: Manual Add Forms
+### Phase 9: Onboarding + First-run Gating
 
-Forms in chat modal as fallback — tests DB services before LLM wiring.
+1. Welcome → model selection (tier cards) → currency → hourly rate (optional) → app lock (optional) → done
+2. Download starts in onboarding, app remains usable during download
+3. Resume/retry states + home progress banner
+4. Root gating: `onboardingStore.completed` redirect in `_layout.tsx`
 
-1. Quick-action cards at top of chat modal (Add Expense, Add Task)
-2. Add-expense form (inline in chat modal) — amount, title, category picker, date
-3. Add-task form (inline in chat modal) — title, priority, due date, reminder
-4. Zod validation (safeParse) on submit → DB write via React Query mutation
-5. Chat input hides while form visible, reappears on dismiss
+- **Exit**: fresh install → onboarding → home. Interrupted download resumes.
+- **Rollback**: if model download UX blocks onboarding, allow "skip model" → download later from Settings
 
-### Phase 10: Prompt Engineering & Eval
+### Phase 10: Prompt Engineering + Eval Harness
 
-Design and validate prompts before wiring into the app. Standalone `eval/` folder with own `package.json` — fully isolated from Expo app, no cross-imports from `../src/`.
+1. Standalone `eval/` workspace (own package.json, Bun, node-llama-cpp)
+2. Array-output extraction: single prompt → typed array of `{type: "expense"|"task", ...fields}` with discriminated union grammar
+3. Operation variants: create (full fields) + update (partial + ID) + delete (ID + type) within same array grammar
+4. Entity resolution prompt: inject recent records into context for update/delete
+5. New Zod schemas in eval: `zUpdateExpense` (partial + ID), `zDeleteExpense` (ID), same for tasks
+6. GBNF grammar: one array grammar with discriminated union items (not 6 separate grammars)
+7. 80+ eval fixtures (create + update + delete + mixed-intent scenarios, English only)
+8. Runner + scoring report + failure taxonomy
+9. Schema sync guard: script that diffs eval schemas against `src/db/schemas.ts`
+10. Token budgets: extract ≤200, freeform ~500
+11. Per-model override testing (base vs override per model family)
+12. **Instrumentation**: accuracy, latency, ambiguity rate per model per fixture
 
-**In-app prompt structure (`src/llm/`):**
+- **Exit**: eval report reproducible. Standard-tier accuracy ≥80%.
+- **Rollback**: if array grammar fails reliability gate, fall back to sequential classify → extract pipeline with cap of 3
+- **Spec**: `docs/eval-harness.md`
 
-```
-src/llm/
-  prompts/
-    system.ts          — base system prompt builder (injects currency, category list, today's date)
-    classifier.ts      — intent classification prompt template
-    expense.ts         — expense extraction prompt template
-    task.ts            — task extraction prompt template
-    types.ts           — PromptConfig type, ModelOverride type
-    overrides/         — per-model content/style adjustments
-      qwen.ts
-      llama.ts
-      gemma.ts
-      phi.ts
-      default.ts       — fallback for unknown models
-  grammars/
-    classifier.gbnf    — constrains output to "expense" | "task" | "question" | "unknown"
-    expense.gbnf       — constrains to ExtractExpense JSON shape
-    task.gbnf          — constrains to ExtractTask JSON shape
-```
+### Phase 11: Chat Core (Echo-first)
 
-**Eval harness (standalone, TypeScript + Bun):**
+Owns all chat UX.
 
-```
-eval/
-  package.json         — standalone deps: node-llama-cpp, zod
-  bun.lock
-  schemas.ts           — extraction Zod schemas duplicated from src/db/schemas.ts (self-contained, no ~/utils/zod or nanoid)
-  prompts/
-    system.ts          — system prompt (developed here first, copied to src/llm/ in Phase 11)
-    classifier.ts      — intent classification prompt
-    expense.ts         — expense extraction prompt
-    task.ts            — task extraction prompt
-  fixtures.json        — 30+ test inputs w/ expected outputs (English only, V1)
-  runner.ts            — loads GGUF via node-llama-cpp, runs fixtures through prompt → grammar → Zod validation
-  report.ts            — accuracy per model, per prompt variant, failure analysis
-  models/              — GGUF files (gitignored)
-```
+1. LLM context manager + LlmProvider
+2. Chat UI: chat-list, chat-bubble, chat-input
+3. Quick-action cards (Add Expense, Add Task) → TanStack Form inline forms
+4. Model-state-aware input: quick-action cards always available; chat input disabled "Model not installed" until model ready
+5. Pre-processor baseline (regex hints: likelyExpense, likelyTask, keywords)
+6. Echo/freeform mode only (no mutations yet)
+7. Stateless sessions: `useState` only, cleared on modal dismiss
 
-**Gitignore:** add `eval/models/` and `eval/node_modules/`.
+- **Instrumentation**: session duration, messages per session, model load-to-first-response
+- **Exit**: chat works on device reliably. Session clears on close. Quick-action cards work without model.
+- **Rollback**: if LLM integration unstable on-device, keep chat as manual-forms-only until stabilized
 
-**Sync strategy (Phase 11):** when integrating into the app, copy finalized prompts from `eval/prompts/` → `src/llm/prompts/`. Extraction schemas in `src/db/schemas.ts` remain the app's source of truth — `eval/schemas.ts` is a dev-time duplicate for fast iteration.
+### Phase 12: Expense Chat Ops (create + update + delete)
 
-**Deliverables:**
+1. Wire pre-processor → array extraction pipeline (single LLM call → typed array)
+2. **Deterministic execution**: dedupe duplicate actions on same entity → execute creates first → updates → deletes last
+3. Create: Zod parse → expense-service mutation → confirmation message
+4. Update: entity resolution (inject recent expenses) → partial parse → update mutation
+5. Delete: entity resolution → identifier → confirmation bottom sheet → in-memory hold (5s undo, commit on background/kill) → hard delete
+6. Idempotent: delete is no-op if entity already deleted
+7. Accept valid items from array, follow-up only on failed ones
+8. Haptics: `success` on create/update, `delete` (heavy) on destructive confirmation
+9. Follow-up within session for partial/ambiguous data
 
-1. Design base system prompt — app context, user preferences (currency, categories), extraction instructions
-2. Write intent-classifier prompt template with hint injection slots (from pre-processor)
-3. Write expense-extraction prompt template conforming to `zExtractExpense` shape
-4. Write task-extraction prompt template conforming to `zExtractTask` shape
-5. Write GBNF grammars for each (classifier, expense, task)
-6. Create model override system — detect model family from GGUF metadata, apply content/tone adjustments (formatting handled by llama.cpp chat templates)
-7. Build eval fixtures — 30+ English user inputs with expected structured outputs
-8. Build eval runner — loads GGUF models via node-llama-cpp, iterates fixtures, validates output against Zod schemas directly
-9. Build comparison report — which models handle which cases, where overrides needed
+- **Instrumentation**: extraction success/fail rate, undo usage, ambiguity follow-up rate, entity resolution accuracy
+- **Exit**: expense create/update/delete safe and deterministic. Undo works within window.
+- **Rollback**: if entity resolution unreliable (>20% wrong-entity rate), defer update/delete to V2; keep create-only
+- **Spec**: `docs/chat-intents.md` (entity resolution rules, destructive action contract, array grammar design)
 
-**Models to test against (from `docs/models.md`):**
+### Phase 13: Task Chat Ops + Notifications
 
-- Light: Qwen3.5-0.8B, Llama-3.2-1B, Gemma-3-1B
-- Standard: Qwen3.5-2B, SmolLM3-3B, Llama-3.2-3B
-- Full: Qwen3.5-4B, Phi-4-mini
+1. Task create/update/delete using same pipeline + safety contract as Phase 12
+2. Install `expo-notifications`, configure permissions
+3. Schedule local notifications for `reminderAt`
+4. Fallback for denied permissions
 
-### Phase 11: Chat Core & LLM
+- **Instrumentation**: task extraction accuracy, reminder scheduling success rate
+- **Exit**: task ops + delete contract + reminders verified.
+- **Rollback**: if notification permissions block UX, ship without reminders; add in-app reminder banner as fallback
 
-llama.rn + echo mode — wires pre-validated prompts. Stateless sessions.
+### Phase 14: Settings + Model Management + Security Surface
 
-1. Install `llama.rn`
-2. Build LLM context manager (`src/llm/context.ts`)
-3. Create LlmProvider
-4. Build regex pre-processor (`src/llm/pre-processor.ts`)
-5. Build chat UI (chat-list, chat-bubble, chat-input)
-6. Implement chat-service pipeline (without extraction — echo mode first)
-7. Chat messages are ephemeral (`useState` in chat modal, NOT stored in DB or Zustand)
-8. Each modal open → fresh session. On dismiss → messages cleared, only extracted entities persist
-9. Update `docs/deps.md` — add `llama.rn`
+1. Settings sections: model picker, currency, hourly rate, categories
+2. Model swap: keep-both + replace-after-download (default UI). "Replace immediately" hidden under advanced.
+3. Category management CRUD
+4. Security: lock toggle, PIN change, recovery questions, privacy toggle
 
-### Phase 12: Expense Extraction
+- **Exit**: all settings persist + survive restart. Model swap flows verified.
+- **Rollback**: if model swap has data-loss risk, ship keep-both only; defer replace strategies
 
-Wire extraction pipeline into chat. Pre-processor + intent classifier + extraction.
-
-1. Wire pre-processor hints into intent-classifier prompt
-2. Wire intent-classifier → expense-extraction prompt + GBNF grammar
-3. Parse JSON → Zod validation (`safeParse` against `zExtractExpense`)
-4. On success → write to DB via expense-service → confirmation message in chat
-5. On failure → clarification message asking for missing data (follow-up within session)
-6. Partial data (e.g. "bought coffee" with no amount) → LLM asks follow-up in same session
-
-### Phase 13: Task Extraction & Notifications
-
-Task pipeline + expo-notifications for reminders.
-
-1. Wire task-extraction prompt + GBNF grammar into chat pipeline
-2. Parse JSON → Zod validation (`safeParse` against `zExtractTask`)
-3. On success → write to DB via task-service → confirmation message
-4. Install `expo-notifications`, configure permissions
-5. Schedule local notifications for tasks with `reminderAt`
-6. Update `docs/deps.md` — add `expo-notifications`
-
-### Phase 14: Settings & Model Management
-
-Model swap (3 strategies), category management, full settings UI.
-
-**Model swap strategies (when user changes model in Settings):**
-
-1. **Keep both** — install new alongside current, user picks active
-2. **Replace after download** — download new first, swap active, then delete old. Non-blocking (app usable during download)
-3. **Replace immediately** — uninstall current, download new. Blocks app until download completes (loading screen)
-
-Uses `expo-file-system` `createDownloadResumable` for download with progress + resume on interrupt.
-
-1. Build model-manager service (download, delete, swap with 3 strategies)
-2. Build settings screen (model picker, currency, hourly rate, categories, security)
-3. Category management UI (add/edit/remove custom categories)
-
-### Phase 15: Attachments
-
-Camera/photo/document picker for expense receipts.
+### Phase 15: Attachments + Hardening + Release
 
 1. Install `expo-image-picker`, `expo-document-picker`, `expo-camera`
-2. Add attachment picker to expense forms (camera, photo library, document)
-3. Store files via `expo-file-system`, reference in `attachments` table
-4. Display attachment thumbnails on expense-card
-5. Update `docs/deps.md` — add `expo-image-picker`, `expo-document-picker`, `expo-camera`
+2. Attachment picker on expense forms, local storage via `expo-file-system`, thumbnails
+3. Error boundaries (per-screen + global)
+4. Empty state illustrations
+5. Haptic tuning pass
+6. CSV export via share sheet
+7. PDF export: stretch — move to V2 if risk threatens release
+8. Accessibility labels on shared components
+9. Final QA + regression sweep
 
-### Phase 16: Polish
-
-Error boundaries, empty states, subscriptions, search, export.
-
-1. Error boundaries (per-screen + global)
-2. Empty state illustrations for lists
-3. Subscription keyword detection in pre-processor + LLM extraction
-4. Expense stats/summaries (daily/weekly/monthly)
-5. Platform-specific haptic feedback tuning
-6. Export (CSV/PDF)
+- **Exit**: attachments reliable. CSV works. `just verify` clean. Release checklist complete.
+- **Rollback**: if camera/document pickers are unstable on specific devices, ship photo-library-only
 
 ---
 
 ## Key Decisions
 
-| Decision                                            | Rationale                                                                                                                                                             |
-| --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Security before chat (Phase 6)**                  | Finance app — trust requires lock screen before any data entry                                                                                                        |
-| **Prompt engineering before chat (Phase 10)**       | Validate prompts work before wiring into UI, faster iteration with Bun eval harness                                                                                   |
-| **Standalone eval harness**                         | Own `package.json` in `eval/`, no cross-imports from `src/`. Extraction schemas (~25 lines) duplicated with just `zod` — avoids `~/utils/zod` → `nanoid` import chain |
-| **Prompts developed in eval first**                 | Faster iteration: edit → run eval → check accuracy. Copy finalized prompts to `src/llm/` in Phase 11                                                                  |
-| **Per-model overrides for content, not formatting** | llama.cpp handles format via chat templates; overrides adjust instruction style per model family                                                                      |
-| **Stateless chat sessions**                         | No memory between sessions, follow-up within session for partial data                                                                                                 |
-| **Ephemeral chat (useState, no DB)**                | Messages don't persist — only extracted entities written to DB                                                                                                        |
-| **Non-blocking model download**                     | Download starts in onboarding, runs in background, only gates chat/AI. Manual forms work immediately                                                                  |
-| **3 model swap strategies**                         | Keep both / replace after download / replace immediately — covers all user preferences                                                                                |
-| **AI-first, manual forms as fallback**              | Chat is primary input; forms exist in chat modal for when user knows exact data                                                                                       |
-| **Echo mode before extraction**                     | De-risk LLM integration — verify chat UI + pipeline works before extraction logic                                                                                     |
-| **GBNF grammars**                                   | Constrain structured LLM output on small models — prevents malformed JSON                                                                                             |
-| **expo-crypto + expo-secure-store for PIN**         | expo-crypto for reliable cross-platform SHA-256, expo-secure-store for keychain/keystore storage                                                                      |
-| **Attempt throttling**                              | 5 attempts → 30s lockout, doubling escalation                                                                                                                         |
-| **Recovery questions**                              | 2 of 4 preset questions, hashed answers in secure store, allows PIN reset                                                                                             |
-| **English only for V1**                             | Scope control; multi-language deferred to V2                                                                                                                          |
-| **Budget goals deferred to V2**                     | Overall daily/weekly/monthly spend limits are V2 scope                                                                                                                |
+| Decision                                           | Rationale                                                                                                                                                                                                                                                                                                                                               |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **@tanstack/react-form + Zod via Standard Schema** | User experience with lib; no adapter package needed; consistent typed forms                                                                                                                                                                                                                                                                             |
+| **CRUD before onboarding**                         | Tab screens are stubs; CRUD gives testable pipeline + real screens before building wizard that lands on them                                                                                                                                                                                                                                            |
+| **LLM spike before prompt eng**                    | Highest technical risk (OOM, latency, thermal); de-risk before investing in prompts/chat                                                                                                                                                                                                                                                                |
+| **Full onboarding at Phase 9 only**                | Dev-skip via USD defaults during Phases 7-8; no guard until Phase 9                                                                                                                                                                                                                                                                                     |
+| **Array-output grammar from V1**                   | Single LLM call → typed array. 1 item = array of 1. Eliminates classifier step, sequential reprocessing, and multi-intent cap. Token budget is natural constraint. Execution order: dedupe duplicate actions on same entity, then creates/updates first, deletes last. Validated in eval; if models struggle, fall back to sequential in implementation |
+| **In-memory hold for undo (no soft-delete)**       | Hold deleted row in state for 5s. Real DELETE after timer. Undo = cancel timer. No schema migration. On background/kill during undo window: commit the delete immediately (user confirmed intent; undo is a convenience, not a guarantee)                                                                                                               |
+| **Unified delete contract (UI + chat)**            | Same safety pattern everywhere: confirmation → 5s undo → idempotent. Consistent UX, single implementation                                                                                                                                                                                                                                               |
+| **Tiered performance budgets**                     | Light/standard/full tiers have different acceptable thresholds. One-size-fits-all gate would reject viable light models                                                                                                                                                                                                                                 |
+| **"Replace immediately" hidden in advanced**       | Default model swap shows keep-both + replace-after-download only                                                                                                                                                                                                                                                                                        |
+| **CSV in MVP, PDF stretch**                        | Strong utility-to-effort ratio; protects timeline                                                                                                                                                                                                                                                                                                       |
+| **Opt-in comfort-first app lock (Phase 6)**        | Data sensitivity is lower than banking apps; lock stays optional with low-friction resume UX                                                                                                                                                                                                                                                            |
+| **Stateless chat sessions**                        | No memory between sessions, follow-up within session for partial data                                                                                                                                                                                                                                                                                   |
+| **Ephemeral chat (useState, no DB)**               | Messages don't persist — only extracted entities written to DB                                                                                                                                                                                                                                                                                          |
+| **expo-crypto + expo-secure-store for PIN**        | expo-crypto for reliable cross-platform SHA-256, expo-secure-store for keychain/keystore storage                                                                                                                                                                                                                                                        |
+| **English only for V1**                            | Scope control; multi-language deferred to V2                                                                                                                                                                                                                                                                                                            |
 
-## V2 Features (post-MVP)
+## V2 (post-MVP)
 
-- Budget goals & threshold alerts (daily/weekly/monthly overall spend limits, 80%/100% notifications)
-- Multi-language support
-- Biometrics (Face ID / fingerprint) for app lock
-- Chat history persistence (optional)
-- Backup/restore (encrypted export + import)
-- Activity log + undo (snapshot-based rollback for AI mutations)
+- PDF export (if not completed in Phase 15)
+- Biometrics (Face ID / fingerprint)
+- Multi-language
+- Chat history persistence
+- Backup/restore
+- Activity log + undo expansion
+- Advanced subscription intelligence
+- Sequential → array grammar fallback removal (if array works in V1)
+- Budget goals & threshold alerts
 
-## New Dependencies by Phase
+## Targeted Specs (created during their phases)
 
-| Phase | Dependency             | Role                                                        |
-| ----- | ---------------------- | ----------------------------------------------------------- |
-| 6     | `expo-secure-store`    | Encrypted storage for PIN hash, salt, recovery answers      |
-| 6     | `expo-crypto`          | SHA-256 hashing via `digestStringAsync`                     |
-| 10    | `node-llama-cpp`       | GGUF model loading + grammar-constrained inference for eval |
-| 7     | `expo-file-system`     | Model download with progress + resume                       |
-| 11    | `llama.rn`             | On-device LLM inference                                     |
-| 13    | `expo-notifications`   | Task reminder notifications                                 |
-| 15    | `expo-image-picker`    | Photo library access                                        |
-| 15    | `expo-document-picker` | Document file selection                                     |
-| 15    | `expo-camera`          | Camera capture for receipts                                 |
+- `docs/llm-spike.md` — device matrix, measurements, tiered budget thresholds, pass/fail (Phase 8)
+- `docs/eval-harness.md` — fixture format, scoring, model matrix, schema sync guard (Phase 10)
+- `docs/chat-intents.md` — entity resolution, array grammar design, destructive action contract (Phase 12)
 
-## Verification
+## Dependency Plan
 
-- `just typecheck` / `just verify` after every phase
-- **Phase 4**: tabs render, FAB visible, chat modal opens/closes
-- **Phase 7**: fresh install → onboarding → home screen with download banner. Kill app → download resumes, banner reappears
-- **Phase 8**: CRUD operations work for expenses and tasks via services
-- **Phase 9**: manual add forms → Zod validation → DB write → appears in list screens
-- **Phase 10**: eval report shows ≥80% extraction accuracy on standard tier models
-- **Phase 11**: type message in chat, get freeform LLM response on real device
-- **Phase 12**: type "bought coffee $4" → expense created with correct amount/category
-- **Phase 13**: "remind me to buy groceries tomorrow at 10am" → task + notification scheduled
-- **Phase 14**: swap model via all 3 strategies, verify each works correctly
-- **Phase 15**: attach photo to expense, verify file stored + thumbnail displays
-- **Phase 6**: enable app lock, background app, re-open → lock screen appears
-- **Phase 6**: tap total on expenses tab → amounts mask, tap again → reveal
+| Phase | Dependency                                                 | Purpose                     |
+| ----- | ---------------------------------------------------------- | --------------------------- |
+| 7     | `@tanstack/react-form`                                     | Form state + validation     |
+| 8     | `expo-file-system`                                         | Model file lifecycle        |
+| 8     | `llama.rn`                                                 | On-device inference runtime |
+| 13    | `expo-notifications`                                       | Task reminders              |
+| 15    | `expo-image-picker`, `expo-document-picker`, `expo-camera` | Attachments                 |
+
+## Verification Gates
+
+- Every phase: `just typecheck` + `just verify`
+- Phase 7: manual CRUD + delete safety contract in UI (confirmation + undo + idempotent)
+- Phase 8: tiered budget gates pass, instrumentation logged, documented in `docs/llm-spike.md`
+- Phase 10: eval ≥80% standard-tier, reproducible report, array grammar validated
+- Phase 12-13: destructive ops confirmed + undo + idempotent. Instrumentation active. Spec in `docs/chat-intents.md`
+- Phase 15: attachments + CSV + release checklist complete
 
 ## Unresolved Questions
 

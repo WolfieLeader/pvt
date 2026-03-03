@@ -7,7 +7,7 @@
 2. Model selection — tier cards from docs/models.md, download starts immediately in background
 3. Currency picker — user's default currency
 4. Hourly rate (optional, skip-able) — "How much do you make per hour?" for work-hours context
-5. App lock setup (optional, skip-able) — passcode + recovery questions (Phase 6 security store)
+5. App lock setup (optional, skip-able) — comfort-first privacy lock with passcode + recovery questions (Phase 6 security store)
 6. Done → Home screen
 ```
 

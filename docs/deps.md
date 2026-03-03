@@ -2,6 +2,8 @@
 
 npm: `npmjs.com/package/{name}`
 
+> When updating a dep, check for updated skills.md / llms.txt / llms-full.txt at the dep's docs site.
+
 ## Production
 
 - **react**, **react-dom** — UI library and DOM renderer — [docs](https://react.dev) · [gh](https://github.com/facebook/react)
@@ -50,7 +52,7 @@ expo, expo-constants, expo-crypto, expo-dev-client, expo-device, expo-font, expo
 
 ```bash
 # Production (future phases)
-bun add llama.rn expo-notifications expo-file-system expo-document-picker expo-image-picker expo-camera
+bun add @tanstack/react-form llama.rn expo-notifications expo-file-system expo-document-picker expo-image-picker expo-camera
 # expo-secure-store and expo-crypto already installed (Phase 6)
 ```
 
@@ -58,6 +60,7 @@ bun add llama.rn expo-notifications expo-file-system expo-document-picker expo-i
 
 | Library                     | Role                                                                                |
 | --------------------------- | ----------------------------------------------------------------------------------- |
+| **@tanstack/react-form**    | Form state + validation via Standard Schema (Zod, no adapter)                       |
 | **zustand**                 | Global state: theme, onboarding status, active model, user settings cache           |
 | **@tanstack/react-query**   | Async data: DB queries, mutations, cache invalidation, optimistic updates           |
 | **@shopify/flash-list** v2  | All lists (chat, expenses, tasks). New Arch only, auto-sizing, masonry support      |
@@ -65,3 +68,18 @@ bun add llama.rn expo-notifications expo-file-system expo-document-picker expo-i
 | **react-native-mmkv**       | Sync key-value: theme pref, onboarding complete flag, last active model ID          |
 | **react-native-reanimated** | Already installed. Shared element transitions, spring animations, layout animations |
 | **@gorhom/bottom-sheet**    | Bottom sheets: filters, category picker, quick edit, confirmations                  |
+
+## AI Resources
+
+Skills and LLM docs available from our deps. Skills live in `.agents/skills/` w/ symlinks in `.claude/skills/`.
+
+| Dep                           | AI Resource                                                                                                     |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| expo (skills repo)            | skill: expo/skills — building-native-ui, native-data-fetching, expo-api-routes, expo-deployment, upgrading-expo |
+| uniwind                       | skill: custom (from docs.uniwind.dev) · [llms.txt](https://docs.uniwind.dev/llms.txt)                           |
+| @react-navigation/\*          | skill: custom (from llms-full.txt) · [llms-full.txt](https://reactnavigation.org/llms-full.txt)                 |
+| drizzle-orm                   | skill: custom (from llms-full.txt, SQLite-filtered) · [llms-full.txt](https://orm.drizzle.team/llms-full.txt)   |
+| @tanstack/react-query         | [llms-full.txt](https://tanstack.com/query/llms-full.txt) — covered by native-data-fetching skill               |
+| zustand                       | [llms.txt](https://github.com/pmndrs/zustand/blob/main/docs/llms.txt)                                           |
+| callstack (RN best practices) | skill: callstackincubator/agent-skills                                                                          |
+| react-native-reanimated       | none                                                                                                            |

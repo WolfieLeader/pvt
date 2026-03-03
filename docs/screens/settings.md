@@ -6,12 +6,17 @@ Grouped sections: Model, Currency, Hourly Rate, Categories, Security.
 
 ## App Lock (optional passcode)
 
-- User sets a 4-6 digit passcode in Settings → Security
-- On app foreground (AppState change), show lock screen if enabled
-- Passcode stored as SHA-256 hash in MMKV (`hashed_passcode` key)
+- User sets a 6-digit passcode in Settings → Security
+- Feature is opt-in privacy for comfort; app remains usable without it
+- On return from background after 5+ minutes, show lock screen if enabled
+- Quick app switches under 5 minutes do not prompt again
+- Passcode stored as SHA-256 hash + salt in expo-secure-store
 - No biometric in V1 — just passcode
 - Root layout gates all routes behind lock check
-- 3 failed attempts → 30s cooldown
+- Cold start still requires passcode when lock is enabled
+- 5 failed attempts → lockout 10s; then 3 attempts per round with lockouts 30s → 60s → 120s (cap)
+- Recovery flow uses the same rate limiting
+- "Forgot Passcode?" hidden during active lockout
 
 ## Amount Masking (privacy mode)
 
